@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>축구 뉴스</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    body {
+      background: #f7f7f7;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .news-site-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .news-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .news-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      padding: 20px;
+      transition: transform 0.2s ease;
+    }
+    .news-card-link:hover .news-card {
+      transform: translateY(-6px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .news-card img {
+      width: 100px;
+      height: 40px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    .news-card h3 {
+      font-size: 18px;
+      margin: 10px 0 5px;
+    }
+    .news-card p {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 style="text-align: center; padding: 30px 20px 10px;">📰 축구 뉴스 사이트 모음</h1>
+    <div class="news-site-grid">
+
+      <!-- ✅ 네이버 스포츠 -->
+      <a href="https://sports.news.naver.com/wfootball/index" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://i.namu.wiki/i/F4KzJz7qHodWhSKNnaNLgJUbOXUfH6tf-CXlCQjqDaucBRwMNCIG8X7xmohPduc4OozWa0GUY7AzCRRY12bwBw.webp" alt="네이버 스포츠 로고">
+          <h3>네이버 스포츠</h3>
+          <p>국내 최대 종합 스포츠 뉴스 포털</p>
+        </div>
+      </a>
+
+      <!-- ✅ 다음 스포츠 -->
+      <a href="https://sports.daum.net/soccer/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://t1.daumcdn.net/media/img-section/sports/meta/noimg_s.png" alt="다음">
+          <h3>다음 스포츠</h3>
+          <p>카카오 기반 해외 축구 뉴스 중심 포털</p>
+        </div>
+      </a>
+
+      <!-- ✅ BBC Sport -->
+      <a href="https://www.bbc.com/sport/football" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://resources.premierleague.pulselive.com/photo-resources/2016/07/01/7954f51f-04a9-487d-8c2a-eb1ba6415bc3/BBC-Sport.png?width=1400&height=800" alt="BBC Sport">
+          <h3>BBC Sport</h3>
+          <p>프리미어리그 및 유럽축구 전문 뉴스</p>
+        </div>
+      </a>
+
+      <!-- ✅ Sky Sports -->
+      <a href="https://www.skysports.com/football/news" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://resources.premierleague.pulselive.com/photo-resources/2020/09/10/74770e21-77e1-4a33-9206-4236897808de/New-Sky-Sports-logo-2020.png?width=1400&height=800" alt="Sky Sports">
+          <h3>Sky Sports</h3>
+          <p>영국 대표 프리미어리그 전문 채널</p>
+        </div>
+      </a>
+
+      <!-- ✅ ESPN FC -->
+      <a href="https://www.espn.com/soccer/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://walkdesign.com/wp-content/uploads/2024/01/ESPN_FC.jpg" alt="ESPN FC">
+          <h3>ESPN FC</h3>
+          <p>전 세계 축구 뉴스 및 칼럼</p>
+        </div>
+      </a>
+
+      <!-- ✅ Goal.com -->
+      <a href="https://www.goal.com/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://i.namu.wiki/i/H5j4di3tWm0gRuHRCN4qYW24Rtd3FdRJInh4IE5uu_onyskeLIpN-wHgB-awxvkDWxT-f7CUEDgbzvE2gw2xpQ.svg" alt="Goal.com">
+          <h3>Goal.com</h3>
+          <p>글로벌 축구 뉴스 플랫폼</p>
+        </div>
+      </a>
+
+      <!-- ✅ Football365 -->
+      <a href="https://www.football365.com/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyBnYcdHw8lzzK4tg1eTfZ1JnoddiEpJ26Ww&s" alt="Football365">
+          <h3>Football365</h3>
+          <p>영국 축구 중심 뉴스 & 칼럼</p>
+        </div>
+      </a>
+
+      <!-- ✅ The Guardian -->
+      <a href="https://www.theguardian.com/football" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIQ5gIxEsoogN2K-xP4oUjfiv1SEQpNZqgNA&s" alt="The Guardian">
+          <h3>The Guardian</h3>
+          <p>품질 높은 프리미어리그 뉴스</p>
+        </div>
+      </a>
+
+      <!-- ✅ Marca -->
+      <a href="https://www.marca.com/en/football.html" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDTfMUYIhZCzABN9vVjLNCyfDls_2MJtJlTw&s" alt="Marca">
+          <h3>Marca</h3>
+          <p>스페인 중심 유럽 축구 뉴스</p>
+        </div>
+      </a>
+
+      <!-- ✅ AS -->
+      <a href="https://en.as.com/soccer/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://previews.123rf.com/images/riedjal/riedjal1602/riedjal160200047/54674090-as-%EB%A1%9C%EA%B3%A0-%EB%98%90%EB%8A%94-%EC%84%9C%EB%AA%85%EC%9D%84%EC%9C%84%ED%95%9C-%EC%95%8C%ED%8C%8C%EB%B2%B3-%EA%B5%AC%EC%84%B1.jpg" alt="AS">
+          <h3>AS</h3>
+          <p>스페인 프리메라리가 주요 매체</p>
+        </div>
+      </a>
+
+      <!-- ✅ Kicker -->
+      <a href="https://www.kicker.de/news/fussball" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Kicker-Sportmagazin_logo.svg/2560px-Kicker-Sportmagazin_logo.svg.png" alt="Kicker">
+          <h3>Kicker</h3>
+          <p>독일 분데스리가 중심 매체</p>
+        </div>
+      </a>
+
+      <!-- ✅ L'Équipe -->
+      <a href="https://www.lequipe.fr/Football/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/L%27%C3%89quipe_wordmark.svg/1200px-L%27%C3%89quipe_wordmark.svg.png" alt="L'Équipe">
+          <h3>L'Équipe</h3>
+          <p>프랑스 리그앙 및 유럽 축구</p>
+        </div>
+      </a>
+
+      <!-- ✅ UEFA -->
+      <a href="https://www.uefa.com/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI-ShOQhLKGHzos7eTDN8ykddMR4bKfTtqYw&s" alt="UEFA">
+          <h3>UEFA.com</h3>
+          <p>UEFA 공식 사이트</p>
+        </div>
+      </a>
+
+      <!-- ✅ FIFA -->
+      <a href="https://www.fifa.com/football" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://cdn.cookielaw.org/logos/a22264f8-9d14-4ab8-ab4b-a61925d0e901/6b589592-a31b-4ede-9440-c6368b1eb13b/d0426540-ceee-4ccb-b321-ac2656d493bb/fcm_rgbf_s.png" alt="FIFA">
+          <h3>FIFA.com</h3>
+          <p>FIFA 공식 사이트</p>
+        </div>
+      </a>
+
+      <!-- ✅ Football Italia -->
+      <a href="https://football-italia.net/" target="_blank" class="news-card-link">
+        <div class="news-card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGcGtvDHzfAsQsJfhLS91Ez039WMnRrlEsPg&s" alt="Football Italia">
+          <h3>Football Italia</h3>
+          <p>세리에A 및 이탈리아 축구 전문</p>
+        </div>
+      </a>
+
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>축구 영상 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .search-bar {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .search-bar input {
+      width: 300px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .search-bar button {
+      padding: 10px 16px;
+      font-size: 16px;
+      margin-left: 8px;
+      border: none;
+      border-radius: 8px;
+      background-color: #375a7f;
+      color: white;
+      cursor: pointer;
+    }
+    .search-bar button:hover {
+      background-color: #2d4e72;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .video-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .video-card:hover {
+      transform: translateY(-5px);
+    }
+    .video-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .video-info {
+      padding: 12px;
+    }
+    .video-info h3 {
+      font-size: 16px;
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+    .video-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚽ 최신 축구 영상</h1>
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="예: 손흥민, 프리미어리그, 하이라이트" />
+    <button onclick="searchVideos()">검색</button>
+  </div>
+
+  <div class="video-grid" id="video-container"></div>
+
+  <script>
+    const apiKey = 'AIzaSyBV3kxY962TDVFM9lhGZ-1chTatZtYui6I';
+    const defaultQuery = '축구 하이라이트';
+    const maxResults = 12;
+
+    function fetchVideos(query = defaultQuery) {
+      fetch(`https://www.googleapis.com/youtube/v3/search?key=${apiKey}&part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=${maxResults}&order=date`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('video-container');
+          container.innerHTML = '';
+
+          if (!data.items) {
+            container.innerHTML = '<p>❌ 영상을 찾을 수 없습니다.</p>';
+            return;
+          }
+
+          data.items.forEach(item => {
+            const videoId = item.id.videoId;
+            const snippet = item.snippet;
+            const videoURL = `https://www.youtube.com/watch?v=${videoId}`;
+
+            const card = document.createElement('a');
+            card.className = 'video-card';
+            card.href = videoURL;
+            card.target = '_blank';
+            card.innerHTML = `
+              <img src="${snippet.thumbnails.high.url}" alt="${snippet.title}">
+              <div class="video-info">
+                <h3>${snippet.title}</h3>
+                <p>${snippet.channelTitle}</p>
+                <p>${new Date(snippet.publishedAt).toLocaleDateString('ko-KR')}</p>
+              </div>
+            `;
+
+            container.appendChild(card);
+          });
+        })
+        .catch(err => {
+          document.getElementById('video-container').innerHTML = `<p>⚠️ 영상 로딩에 실패했습니다.</p>`;
+          console.error(err);
+        });
+    }
+
+    function searchVideos() {
+      const keyword = document.getElementById('search-input').value.trim();
+      if (keyword) {
+        fetchVideos(keyword);
+      } else {
+        fetchVideos(defaultQuery);
+      }
+    }
+
+    // 페이지 로드 시 기본 영상 검색
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchVideos();
+    });
+  </script>
+
+</body>
+</html>

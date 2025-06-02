@@ -1,0 +1,480 @@
+  <style>
+    * {box-sizing: border-box;}
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+   header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 16px 40px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+}
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+  color: #153b6d;
+}
+
+.search {
+  padding: 10px 16px;
+  font-size: 15px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-btn, .menu-btn {
+  font-size: 14px;
+  border: 1px solid #1e40af;
+  background: white;
+  color: #1e40af;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-btn:hover, .menu-btn:hover {
+  background: #1e40af;
+  color: white;
+}
+          .window {
+      width: 300px;
+      height: 200px;
+      background: white;
+      border: 1px solid #aaa;
+      position: fixed;
+      top: 50px;
+      left: 50px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      resize: none;
+      transition: all 0.3s ease;
+      z-index: 100;
+      min-width: 240px;
+      min-height: 120px;
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .window-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #1e3c72, #2a5298);
+  color: white;
+  padding: 4px 10px;
+  min-height: 36px;
+  height: 36px;               /* ✅ 고정 높이 */
+  cursor: move;
+  user-select: none;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  flex-shrink: 0;             /* ✅ 크기 줄지 않도록 */
+}
+
+
+.window-header button {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  color: white;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+.window-header button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: white;
+      transform: scale(1.1);
+    }
+
+    .window-content {
+      padding: 10px;
+      height: calc(100% - 30px);
+      overflow: auto;
+    }
+   footer#taskbar {
+      width: 60px;
+      height: 100vh;
+      background: #fff;
+      border-right: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      left: -60px; /* 숨겨진 상태 */
+      z-index: 1000;
+      transition: left 0.3s ease;
+    }
+
+
+   .taskbar-btn {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  background: #1a3c78;
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 6px; /* 버튼 간 여백 */
+}
+
+.taskbar-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+
+/* 아이콘 간 경계선 */
+.taskbar-btn:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1); /* 희미한 경계선 */
+}
+
+    .taskbar-btn.hidden {
+      background: #d9ecff;
+      color: black;
+    }
+ .taskbar-btn:hover {
+      background: #2a4f94;
+      transform: scale(1.05);
+    }
+    .taskbar-btn.hidden:hover {
+      background: #8ecaff;
+    }
+    .resize-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: transparent;
+    }
+.resize-l, .resize-r, .resize-t, .resize-b,
+.resize-tl, .resize-tr, .resize-bl, .resize-br {
+  position: absolute;
+  z-index: 10;
+  background: rgba(0,0,0,0.01);
+}
+
+/* 각 방향 핸들 위치 */
+.resize-l { left: -6px; top: 0; width: 12px; height: 100%; cursor: ew-resize; }
+.resize-r { right: -6px; top: 0; width: 12px; height: 100%; cursor: ew-resize; }
+.resize-t { top: -6px; left: 0; width: 100%; height: 12px; cursor: ns-resize; }
+.resize-b { bottom: -6px; left: 0; width: 100%; height: 12px; cursor: ns-resize; }
+
+.resize-br {
+  bottom: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  cursor: nwse-resize;
+  z-index: 9999;
+}
+
+.resize-bl {
+  bottom: -8px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  cursor: nesw-resize;
+  z-index: 9999;
+}
+
+.resize-tr {
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  cursor: nesw-resize;
+  z-index: 9999;
+}
+
+.resize-tl {
+  top: -8px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  cursor: nwse-resize;
+  z-index: 9999;
+}
+   
+    .hide {
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+     .taskbar-home {
+      width: 38px;
+      height: 38px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid #aaa;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+   .taskbar-home:hover {
+      background: #e4e4e4;
+      transform: scale(1.05);
+    }
+ #taskbar-icons {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  width: 100%;
+  flex-grow: 1;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2); /* 경계선 더 확실하게 */
+}
+
+
+#taskbar-sensor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100vh;
+  z-index: 999;
+}
+
+.window-layout-btn {
+  background: #ccc;
+  border: none;
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.window-layout-menu {
+  position: absolute;
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  padding: 10px;
+  width: 100px;
+  height: 150px;
+  z-index: 9999;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.window-layout-menu div {
+  background: #e3e3e3;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.window-layout-menu div:hover {
+  background: #c3c3c3;
+}
+
+
+.window-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0; /* ✅ 줄어들지 않게 */
+  overflow: hidden;
+}
+.window-title {
+  font-weight: bold;
+  font-size: 15px;
+  color: white;
+}
+.window-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0; /* ✅ 버튼이 줄어들지 않게 */
+}
+#right-menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 100vh;
+  background: #f9f9f9;
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+
+  /* ✅ 기본 상태에서 화면 오른쪽 바깥으로 완전히 숨김 */
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+#right-menu-panel.active {
+  /* ✅ 메뉴 버튼 클릭 시 화면 안쪽으로 슬라이드 */
+  transform: translateX(0);
+}
+#right-menu-panel h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #153b6d;
+}
+
+#right-menu-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+#right-menu-panel ul li {
+  margin-bottom: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #1f2937;
+}
+
+#right-menu-panel ul li:hover {
+  color: #1e40af;
+}
+
+
+/* 닫기 버튼 */
+#right-menu-panel button {
+  font-size: 16px;
+  color: #153b6d;
+}
+
+#right-menu-panel button:hover {
+  color: #1e40af;
+}
+/* /닫기 버튼 */
+
+
+/* 상단 탭 메뉴 */
+nav.tab-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  padding: 4px 0;
+  background: #e8f0ff;
+  font-size: 17px;
+  font-weight: 600;
+  border-bottom: 1px solid #dbeafe;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+nav.tab-menu a {
+  position: relative;
+  color: #1f2937;
+  text-decoration: none;
+  padding: 2px 3px;
+  transition: color 0.2s ease;
+}
+
+nav.tab-menu a:hover {
+  color: #1e40af;
+}
+
+nav.tab-menu a:hover::after,
+nav.tab-menu a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 3px;
+  background-color: #1e40af;
+  border-radius: 2px;
+}
+
+nav.tab-menu a.active {
+  color: #1e40af;
+}
+.pin-toggle-btn {
+  background: #ccc;
+  border: none;
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+.pin-toggle-btn.pinned {
+  background: #1e40af;
+  color: white;
+}
+.window.pinned .resize-handle,
+.window.pinned .window-layout-btn {
+  pointer-events: none;
+  opacity: 0.4;
+  cursor: default;
+}
+/* 고정 상태일 때는 커서를 기본(default)으로 변경 */
+.window.pinned .window-header {
+  cursor: default;
+}
+.window-header button:disabled {
+  opacity: 0.4;
+}
+
+/* /상단 탭 메뉴 */
+
+  </style>

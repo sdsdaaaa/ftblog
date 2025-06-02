@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>경기 통계 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    select, .nav-btn {
+      padding: 8px;
+      font-size: 14px;
+    }
+    .date-display {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .match-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    .match-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .match-item:hover {
+      background-color: #eaf2ff;
+    }
+    .stat-table {
+      margin: 0 auto;
+      max-width: 700px;
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .stat-table th, .stat-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-table th {
+      background: #dce6f7;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 경기 통계</h1>
+
+  <div class="top-bar">
+    <select id="league-select" onchange="fetchMatches()">
+      <option value="">리그 선택 중...</option>
+    </select>
+    <button class="nav-btn" onclick="changeDate(-1)">◀ 이전</button>
+    <span class="date-display" id="date-label"></span>
+    <button class="nav-btn" onclick="changeDate(1)">다음 ▶</button>
+  </div>
+
+  <div class="match-list" id="match-list"></div>
+  <div id="stat-section"></div>
+
+  <script>
+    const apiKey = "dba62925619cc528de8b6acc72548d85";
+
+    const statMap = {
+      "Shots on Goal": "유효 슈팅", "Shots off Goal": "빗나간 슛", "Total Shots": "총 슈팅 수",
+      "Ball Possession": "점유율", "Passes accurate": "정확한 패스", "Passes %": "패스 성공률",
+      "Fouls": "반칙", "Yellow Cards": "옐로 카드", "Red Cards": "레드 카드",
+      "Offsides": "오프사이드", "Corners": "코너킥", "Goalkeeper Saves": "선방",
+      "Shots insidebox": "박스 안 슛", "Shots outsidebox": "박스 밖 슛", "expected_goals": "기대 득점"
+    };
+
+    let currentDateIndex = 7;
+    const today = new Date();
+    const dateRange = Array.from({ length: 15 }, (_, i) => {
+      const d = new Date();
+      d.setDate(today.getDate() + i - 7);
+      return d.toISOString().split('T')[0];
+    });
+
+    function updateDateLabel() {
+      document.getElementById('date-label').textContent = `날짜: ${dateRange[currentDateIndex]}`;
+    }
+
+    function changeDate(delta) {
+      currentDateIndex += delta;
+      if (currentDateIndex < 0) currentDateIndex = 0;
+      if (currentDateIndex >= dateRange.length) currentDateIndex = dateRange.length - 1;
+      updateDateLabel();
+      fetchMatches();
+    }
+
+    function loadLeagues() {
+      fetch(`https://v3.football.api-sports.io/leagues`, {
+        headers: { 'x-apisports-key': apiKey }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('league-select');
+        select.innerHTML = '<option value="">리그를 선택하세요</option>';
+
+        data.response.forEach(lg => {
+          const opt = document.createElement('option');
+          opt.value = lg.league.id;
+          opt.text = `${lg.league.name} (${lg.country.name})`;
+          select.appendChild(opt);
+        });
+      });
+    }
+
+    function fetchMatches() {
+      const league = document.getElementById('league-select').value;
+      if (!league) return;
+
+      const date = dateRange[currentDateIndex];
+
+      fetch(`https://v3.football.api-sports.io/fixtures?league=${league}&season=2023&date=${date}`, {
+        headers: { 'x-apisports-key': apiKey }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('match-list');
+        list.innerHTML = '';
+        document.getElementById('stat-section').innerHTML = '';
+
+        if (data.results === 0) {
+          list.innerHTML = '<p>경기 정보가 없습니다.</p>';
+          return;
+        }
+
+        data.response.forEach(fix => {
+          const div = document.createElement('div');
+          div.className = 'match-item';
+          div.textContent = `${fix.teams.home.name} ${fix.goals.home ?? '-'} : ${fix.goals.away ?? '-'} ${fix.teams.away.name}`;
+          div.onclick = () => fetchStats(fix.fixture.id, fix.teams.home.name, fix.teams.away.name);
+          list.appendChild(div);
+        });
+      });
+    }
+
+    function fetchStats(fixtureId, homeName, awayName) {
+      fetch(`https://v3.football.api-sports.io/fixtures/statistics?fixture=${fixtureId}`, {
+        headers: { 'x-apisports-key': apiKey }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const section = document.getElementById('stat-section');
+        section.innerHTML = `<h2 style="text-align:center">📋 ${homeName} vs ${awayName} 통계</h2>`;
+
+        if (data.response.length < 2) return section.innerHTML += '<p>통계 정보가 없습니다.</p>';
+
+        const [home, away] = data.response;
+        const table = document.createElement('table');
+        table.className = 'stat-table';
+        table.innerHTML = `<tr><th>항목</th><th>${homeName}</th><th>${awayName}</th></tr>`;
+
+        home.statistics.forEach((stat, i) => {
+          const row = document.createElement('tr');
+          const label = statMap[stat.type] || stat.type;
+          row.innerHTML = `
+            <td>${label}</td>
+            <td>${stat.value ?? '-'}</td>
+            <td>${away.statistics[i]?.value ?? '-'}</td>
+          `;
+          table.appendChild(row);
+        });
+
+        section.appendChild(table);
+      });
+    }
+
+    // 초기 실행
+    updateDateLabel();
+    loadLeagues();
+  </script>
+</body>
+</html>

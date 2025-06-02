@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Footballog 데스크탑 UI</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/script.js" defer></script>
+  <style>
+    .login-btn {
+      padding: 8px 14px;
+      background-color: #0077cc;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .login-btn:hover {
+      background-color: #005fa3;
+    }
+    #welcomeText {
+      font-size: 12px;
+      color: #ccc;
+      max-width: 120px;
+      line-height: 1.4;
+      white-space: normal;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- ✅ 왼쪽 마우스 감지 센서 -->
+  <div id="taskbar-sensor" style="position: fixed; top: 0; left: 0; width: 5px; height: 100vh; z-index: 10000;"></div>
+
+  <!-- ✅ 헤더 -->
+  <header>
+    <div class="left-section">
+      <div class="logo">FOOTBALLOG</div>
+      <input class="search" placeholder="검색 :" />
+    </div>
+    <div class="right-section">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div id="welcomeText"></div>
+        <a href="mypage.html" id="mypageBtn" class="login-btn" style="display: none;">마이페이지</a>
+      </div>
+      <a id="loginControl" href="login.html" class="login-btn">로그인</a>
+      <button class="menu-btn" onclick="toggleRightMenu()">☰</button>
+    </div>
+  </header>
+
+  <!-- ✅ 탭 메뉴 -->
+  <nav class="tab-menu">
+    <a href="home.html" class="active">홈</a>
+    <a href="schedule.html">일정</a>
+    <a href="ranking.html">순위</a>
+  </nav>
+
+  <!-- ✅ 푸터 작업표시줄 -->
+  <footer id="taskbar">
+    <div id="taskbar-icons"></div>
+    <div class="taskbar-home">⌂</div>
+  </footer>
+
+  <!-- ✅ 우측 메뉴 -->
+  <div id="right-menu-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">메뉴</h3>
+      <button onclick="toggleRightMenu()" style="border: none; background: none; font-size: 18px; cursor: pointer;">≫</button>
+    </div>
+    <ul>
+      <li onclick="handleMenuClick('football-news')">축구 뉴스</li>
+      <li onclick="handleMenuClick('community')">커뮤니티</li>
+      <li onclick="handleMenuClick('goods-shopping')">굿즈 쇼핑</li>
+      <li onclick="handleMenuClick('match-stats')">경기 통계</li>
+      <li onclick="handleMenuClick('match-broadcast')">경기 중계</li>
+      <li onclick="handleMenuClick('football-video')">축구 영상</li>
+      <li onclick="handleMenuClick('app-recommendations')">앱 추천</li>
+      <li onclick="handleMenuClick('contact-us')">문의하기</li>
+    </ul>
+  </div>
+
+  <!-- ✅ 우클릭 메뉴 -->
+  <ul id="context-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 0; margin: 0; list-style: none; z-index: 10000;">
+    <li id="ctx-close" style="padding: 8px 12px; cursor: pointer;">닫기</li>
+  </ul>
+
+  <!-- ✅ 본문 콘텐츠 -->
+  <main style="padding: 30px;">
+    <!-- 여기에 페이지별 콘텐츠 삽입 -->
+    <h1>📄 FOOTBALLOG 기본 템플릿</h1>
+    <p>페이지별 내용을 여기에 채워 넣으세요.</p>
+  </main>
+
+  <!-- ✅ Firebase + 로그인 상태 처리 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+      measurementId: "G-562VJ9VE2P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const loginControl = document.getElementById("loginControl");
+      const mypageBtn = document.getElementById("mypageBtn");
+      const welcomeText = document.getElementById("welcomeText");
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // 로그인 상태
+          loginControl.textContent = "로그아웃";
+          loginControl.href = "#";
+          loginControl.onclick = () => {
+            signOut(auth).then(() => {
+              alert("로그아웃되었습니다.");
+              location.reload();
+            });
+          };
+          if (mypageBtn) mypageBtn.style.display = "inline-block";
+
+          const docRef = doc(db, "users", user.uid);
+          getDoc(docRef).then(docSnap => {
+            if (docSnap.exists()) {
+              const nickname = docSnap.data().nickname;
+              if (welcomeText) {
+                welcomeText.textContent = `${nickname}님, \n환영합니다.`;
+                welcomeText.style.display = "block";
+              }
+            }
+          }).catch(console.error);
+        } else {
+          // 로그아웃 상태
+          loginControl.textContent = "로그인";
+          loginControl.href = "login.html";
+          loginControl.onclick = null;
+          if (mypageBtn) mypageBtn.style.display = "none";
+          if (welcomeText) welcomeText.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>FOOTBALLOG - 로그인</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1f2c4c, #3a506b);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      margin: 0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00c3ff;
+      cursor: pointer;
+    }
+    .home-button {
+      font-size: 14px;
+      padding: 8px 16px;
+      border: none;
+      background-color: #00aaff;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .home-button:hover {
+      background-color: #0077cc;
+    }
+    main.login-container {
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      margin: 80px auto;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    .input-group input::placeholder {
+      color: #ccc;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00aaff;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    button[type="submit"]:hover {
+      background-color: #0077cc;
+    }
+    .signup-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .signup-link a {
+      color: #00c3ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+        <div class="logo" onclick="location.href='home.html'">FOOTBALLOG</div>
+<button class="home-button" onclick="location.href='home.html'">back to home</button>
+
+  </header>
+
+  <main class="login-container">
+    <h2>로그인</h2>
+    <form onsubmit="event.preventDefault(); loginUser();">
+      <div class="input-group">
+        <label for="username">이메일</label>
+        <input type="email" id="username" required placeholder="이메일을 입력하세요" />
+      </div>
+      <div class="input-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" required placeholder="비밀번호를 입력하세요" />
+      </div>
+      <button type="submit">로그인</button>
+    </form>
+    <p class="signup-link">
+      아직 계정이 없으신가요? <a href="signup.html">회원가입</a>
+    </p>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.loginUser = function () {
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("✅ 로그인 성공!");
+          window.location.href = "home.html";
+        })
+        .catch((error) => {
+          alert("❌ 로그인 실패: " + error.message);
+        });
+    };
+  </script>
+</body>
+</html>

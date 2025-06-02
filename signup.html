@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #1f2c4c, #3a506b);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      margin: 0;
+    }
+    main.signup-container {
+      max-width: 450px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      margin: 80px auto;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    .input-group {
+      margin-bottom: 18px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    .input-group input::placeholder {
+      color: #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #00aaff;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0077cc;
+    }
+    #verifySection {
+      display: none;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .login-link a {
+      color: #00c3ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main class="signup-container">
+    <h2>회원가입</h2>
+    <form onsubmit="event.preventDefault(); signupUser();">
+      <div class="input-group">
+        <label for="name">이름</label>
+        <input type="text" id="name" required />
+      </div>
+     <div class="input-group">
+  <label for="email">이메일</label>
+  <input type="email" id="email" required />
+  <small id="email-status" style="font-size: 12px; display: block; margin-top: 4px;"></small>
+  <button type="button" onclick="sendVerificationEmail()">인증 메일 전송</button>
+</div>
+
+      <div id="verifySection">
+        <p style="font-size:14px;">이메일 인증 완료 여부를 확인하려면 아래 버튼을 누르세요.</p>
+        <button type="button" onclick="checkEmailVerification()">인증 완료 확인</button>
+        <p id="verificationResult" style="margin-top: 5px;"></p>
+      </div>
+      <div class="input-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" required />
+      </div>
+      <div class="input-group">
+        <label for="confirm-password">비밀번호 확인</label>
+        <input type="password" id="confirm-password" required />
+      </div>
+<div class="input-group">
+  <label for="nickname">닉네임</label>
+  <input type="text" id="nickname" required style="margin-bottom: 8px;" />
+  <button type="button" onclick="checkNickname()" style="width: 100%; padding: 10px;">중복확인</button>
+  <small id="nickname-status" style="font-size: 12px; display: block; margin-top: 4px;"></small>
+</div>
+
+
+      <div class="input-group">
+        <label for="age">나이</label>
+        <input type="number" id="age" required />
+      </div>
+      <div class="input-group">
+        <label for="phone">전화번호</label>
+        <input type="tel" id="phone" required />
+      </div>
+      <button type="submit">회원가입</button>
+    </form>
+    <p class="login-link">
+      이미 계정이 있으신가요? <a href="login.html">로그인</a>
+    </p>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+let nicknameChecked = false;
+let lastCheckedNickname = "";
+
+document.getElementById("nickname").addEventListener("input", () => {
+  nicknameChecked = false;
+  document.getElementById("nickname-status").textContent = "";
+});
+
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+window.checkNickname = async () => {
+  const nickname = document.getElementById("nickname").value.trim();
+  const statusEl = document.getElementById("nickname-status");
+
+  if (!nickname) {
+    statusEl.textContent = "❌ 닉네임을 입력해주세요.";
+    statusEl.style.color = "red";
+    nicknameChecked = false;
+    return;
+  }
+
+  try {
+    const q = query(collection(db, "users"), where("nickname", "==", nickname));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      statusEl.textContent = "❌ 이미 사용 중인 닉네임입니다.";
+      statusEl.style.color = "red";
+      nicknameChecked = false;
+    } else {
+      statusEl.textContent = "✅ 사용 가능한 닉네임입니다.";
+      statusEl.style.color = "lightgreen";
+      nicknameChecked = true;
+      lastCheckedNickname = nickname;
+    }
+  } catch (err) {
+    statusEl.textContent = "오류: " + err.message;
+    statusEl.style.color = "red";
+    nicknameChecked = false;
+  }
+};
+
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let verifiedEmail = null;
+
+   window.sendVerificationEmail = async () => {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const statusEl = document.getElementById('email-status');
+
+  statusEl.textContent = ""; // 초기화
+
+  if (!email || !password) {
+    statusEl.textContent = "❗ 이메일과 비밀번호를 입력하세요.";
+    statusEl.style.color = "red";
+    return;
+  }
+
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+    await sendEmailVerification(userCred.user);
+
+    verifiedEmail = userCred.user;
+    document.getElementById('verifySection').style.display = 'block';
+
+    statusEl.textContent = "✅ 인증 메일을 보냈습니다. 메일함을 확인하세요.";
+    statusEl.style.color = "lightgreen";
+  } catch (e) {
+    statusEl.textContent = "❌ 이미 가입된 메일입니다. ";
+    statusEl.style.color = "red";
+  }
+};
+
+
+    window.checkEmailVerification = async () => {
+      if (!verifiedEmail) return alert("먼저 인증 메일을 전송하세요.");
+      await verifiedEmail.reload();
+      if (verifiedEmail.emailVerified) {
+        document.getElementById("verificationResult").textContent = "✅ 인증 완료되었습니다.";
+      } else {
+        document.getElementById("verificationResult").textContent = "❗ 인증이 아직 되지 않았습니다.";
+      }
+    };
+
+    window.signupUser = async () => {
+      const name = document.getElementById("name").value.trim();
+      const nickname = document.getElementById("nickname").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirm-password").value.trim();
+
+      const submitBtn = document.querySelector("button[type='submit']");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "처리 중...";
+
+      if (!verifiedEmail || !verifiedEmail.emailVerified) {
+        alert("❗ 이메일 인증을 완료해주세요.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "회원가입";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("❗ 비밀번호가 일치하지 않습니다.");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "회원가입";
+        return;
+      }
+// 🔽 여기에 추가!
+if (!nicknameChecked || nickname !== lastCheckedNickname) {
+  alert("❗ 닉네임 중복 확인을 해주세요.");
+  submitBtn.disabled = false;
+  submitBtn.textContent = "회원가입";
+  return;
+}
+
+
+      try {
+        await setDoc(doc(db, "users", verifiedEmail.uid), {
+          name, nickname, age, phone, email: verifiedEmail.email, uid: verifiedEmail.uid
+        });
+        alert("🎉 회원가입 완료! 로그인 페이지로 이동합니다.");
+        window.location.href = "login.html";
+      } catch (e) {
+        alert("❌ 회원 정보 저장 실패: " + e.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "회원가입";
+      }
+    };
+  </script>
+</body>
+</html>

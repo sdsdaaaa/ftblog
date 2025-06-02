@@ -1,0 +1,356 @@
+<!-- 여기부터 고정 -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Footballog - 순위</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="js/script.js" defer></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+    authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+    projectId: "northern-cooler-461505-d5",
+    storageBucket: "northern-cooler-461505-d5.appspot.com",
+    messagingSenderId: "57199546606",
+    appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+    measurementId: "G-562VJ9VE2P"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.querySelector(".login-btn");
+    const mypageBtn = document.getElementById("mypageBtn");
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loginBtn.textContent = "로그아웃";
+        loginBtn.href = "#";
+        loginBtn.onclick = () => {
+          signOut(auth).then(() => {
+            alert("로그아웃되었습니다.");
+            location.reload();
+          });
+        };
+        if (mypageBtn) mypageBtn.style.display = "inline-block";
+      } else {
+        loginBtn.textContent = "로그인";
+        loginBtn.href = "login.html";
+        if (mypageBtn) mypageBtn.style.display = "none";
+      }
+    });
+  });
+</script>
+</head>
+
+<body>
+  <!-- ✅ 공통 UI 구조 -->
+  <div id="taskbar-sensor" style="position: fixed; top: 0; left: 0; width: 5px; height: 100vh; z-index: 10000;"></div>
+
+  <!-- 상단바 -->
+  <header>
+    <div class="left-section">
+      <div class="logo">FOOTBALLOG</div>
+      <input class="search" placeholder="검색 :" />
+    </div>
+    <div class="right-section">
+      <a href="mypage.html" id="mypageBtn" class="login-btn" style="margin-right: 10px; display: none;">마이페이지</a>
+
+<a href="login.html" class="login-btn">로그인</a>
+<button class="menu-btn" onclick="toggleRightMenu()">☰</button>
+
+    </div>
+  </header>
+
+  <!-- 탭 메뉴 -->
+  <nav class="tab-menu">
+    <a href="home.html">홈</a>
+    <a href="schedule.html">일정</a>
+    <a href="ranking.html" class="active">순위</a>
+  </nav>
+
+  <!-- 작업 표시줄 -->
+  <footer id="taskbar">
+    <div id="taskbar-icons"></div>
+    <div class="taskbar-home">⌂</div>
+  </footer>
+
+  <!-- 동적으로 버튼이 추가될 공간 -->
+  <div id="dynamic-buttons-container"></div>
+
+  <!-- 우측 메뉴 패널 -->
+  <div id="right-menu-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="margin: 0;">메뉴</h3>    
+      <button onclick="toggleRightMenu()" style="border: none; background: none; font-size: 18px; cursor: pointer;">≫</button>
+    </div>
+    <ul>
+      <li onclick="handleMenuClick('football-news')">축구 뉴스</li>
+      <li onclick="handleMenuClick('community')">커뮤니티</li>
+      <li onclick="handleMenuClick('goods-shopping')">굿즈 쇼핑</li>
+      <li onclick="handleMenuClick('match-stats')">경기 통계</li>
+      <li onclick="handleMenuClick('match-broadcast')">경기 중계</li>
+      <li onclick="handleMenuClick('football-video')">축구 영상</li>
+      <li onclick="handleMenuClick('app-recommendations')">앱 추천</li>
+      <li onclick="handleMenuClick('contact-us')">문의하기</li>
+    </ul>
+  </div>
+
+  <!-- ✅ 우클릭 컨텍스트 메뉴 -->
+  <ul id="context-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 0; margin: 0; list-style: none; z-index: 10000;">
+    <li id="ctx-close" style="padding: 8px 12px; cursor: pointer;">닫기</li>
+  </ul>
+
+  
+
+<style>
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f0f4ff; }
+    img.team-logo { width: 32px; height: 30px; vertical-align: middle; margin-right: 8px; }
+    td.team-name { text-align: left; }
+
+      table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+  th { background-color: #f0f4ff; }
+  button.stat-btn {
+    padding: 4px 8px; margin: 0 2px; cursor: pointer;
+  }
+#container {
+  display: flex;
+  gap: 50px;
+  min-height: 600px; /* 최소 높이 지정 */
+  padding: 10px 20px;
+  box-sizing: border-box;
+  /* 높이 제한 없애서 컨텐츠가 늘어나면 페이지가 스크롤됨 */
+}
+
+#leftPane, #rightPane {
+  flex: 1;
+  /* 높이 고정 없애고 스크롤 제거 */
+  overflow: visible;
+  /* 너비 조절 */
+}
+
+#leftPane {
+  flex: 3;
+}
+
+#rightPane {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+#rightPane > div:first-of-type {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+#rightPane button {
+  flex: 1;
+  padding: 8px 0;
+  cursor: pointer;
+  border: 1px solid #999;
+  border-radius: 5px;
+  background-color: white;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+#rightPane button.active,
+#rightPane button:hover {
+  background-color: #cce0ff;
+  border-color: #4a90e2;
+}
+
+#playerList table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#playerList th, #playerList td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: left;
+}
+
+#playerList th {
+  background-color: #f0f4ff;
+}
+</style>
+
+
+<div id="container">
+  <div id="leftPane">
+    <h2>⚽ EPL 2024~25 시즌 최종 순위</h2>
+    <table id="standingsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>팀</th>
+          <th>경기</th>
+          <th>승</th>
+          <th>무</th>
+          <th>패</th>
+          <th>득점</th>
+          <th>실점</th>
+          <th>골득실</th>
+          <th>승점</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="rightPane">
+    <h2 id="statTitle">선수 기록 보기</h2>
+    <div>
+      <button id="btnGoals" class="active">득점 선수</button>
+      <button id="btnAssists">어시스트 선수</button>
+    </div>
+    <div id="playerList">
+      <!-- 선수 목록 테이블 표시 영역 -->
+    </div>
+  </div>
+</div>
+
+<script>
+const standings = [
+  { position: 1, team: "리버풀", played: 38, won: 25, draw: 9, lost: 4, goalsFor: 86, goalsAgainst: 41, goalDiff: 45, points: 84, logo: "https://crests.football-data.org/64.png" },
+  { position: 2, team: "아스널", played: 38, won: 20, draw: 14, lost: 4, goalsFor: 69, goalsAgainst: 34, goalDiff: 35, points: 74, logo: "https://crests.football-data.org/57.png" },
+  { position: 3, team: "맨체스터 시티", played: 38, won: 21, draw: 8, lost: 9, goalsFor: 72, goalsAgainst: 44, goalDiff: 28, points: 71, logo: "https://crests.football-data.org/65.png" },
+  { position: 4, team: "첼시", played: 38, won: 20, draw: 9, lost: 9, goalsFor: 64, goalsAgainst: 43, goalDiff: 21, points: 69, logo: "https://crests.football-data.org/61.png" },
+  { position: 5, team: "뉴캐슬", played: 38, won: 20, draw: 6, lost: 12, goalsFor: 68, goalsAgainst: 47, goalDiff: 21, points: 66, logo: "https://crests.football-data.org/67.png" },
+  { position: 6, team: "애스턴 빌라", played: 38, won: 19, draw: 9, lost: 10, goalsFor: 58, goalsAgainst: 51, goalDiff: 7, points: 66, logo: "https://crests.football-data.org/58.png" },
+  { position: 7, team: "노팅엄 포레스트", played: 38, won: 19, draw: 8, lost: 11, goalsFor: 58, goalsAgainst: 46, goalDiff: 12, points: 65, logo: "https://crests.football-data.org/31.png" },
+  { position: 8, team: "브라이턴", played: 38, won: 16, draw: 13, lost: 9, goalsFor: 66, goalsAgainst: 59, goalDiff: 7, points: 61, logo: "https://crests.football-data.org/397.png" },
+  { position: 9, team: "본머스", played: 38, won: 15, draw: 11, lost: 12, goalsFor: 58, goalsAgainst: 46, goalDiff: 12, points: 56, logo: "https://crests.football-data.org/104.png" },
+  { position: 10, team: "브렌트퍼드", played: 38, won: 16, draw: 8, lost: 14, goalsFor: 66, goalsAgainst: 57, goalDiff: 9, points: 56, logo: "https://crests.football-data.org/402.png" },
+  { position: 11, team: "풀럼", played: 38, won: 15, draw: 9, lost: 14, goalsFor: 54, goalsAgainst: 54, goalDiff: 0, points: 54, logo: "https://crests.football-data.org/54.png" },
+  { position: 12, team: "크리스털 팰리스", played: 38, won: 13, draw: 14, lost: 11, goalsFor: 51, goalsAgainst: 51, goalDiff: 0, points: 53, logo: "https://crests.football-data.org/354.png" },
+  { position: 13, team: "에버턴", played: 38, won: 11, draw: 15, lost: 12, goalsFor: 42, goalsAgainst: 44, goalDiff: -2, points: 48, logo: "https://crests.football-data.org/62.png" },
+  { position: 14, team: "웨스트 햄", played: 38, won: 11, draw: 10, lost: 17, goalsFor: 46, goalsAgainst: 62, goalDiff: -16, points: 43, logo: "https://crests.football-data.org/563.png" },
+  { position: 15, team: "맨유", played: 38, won: 11, draw: 9, lost: 18, goalsFor: 44, goalsAgainst: 54, goalDiff: -10, points: 42, logo: "https://crests.football-data.org/66.png" },
+  { position: 16, team: "울브스", played: 38, won: 12, draw: 6, lost: 20, goalsFor: 54, goalsAgainst: 69, goalDiff: -15, points: 42, logo: "https://crests.football-data.org/76.png" },
+  { position: 17, team: "토트넘", played: 38, won: 11, draw: 5, lost: 22, goalsFor: 64, goalsAgainst: 65, goalDiff: -1, points: 38, logo: "https://crests.football-data.org/73.png" },
+  { position: 18, team: "레스터 시티", played: 38, won: 6, draw: 7, lost: 25, goalsFor: 33, goalsAgainst: 80, goalDiff: -47, points: 25, logo: "https://crests.football-data.org/338.png" },
+  { position: 19, team: "입스위치", played: 38, won: 4, draw: 10, lost: 24, goalsFor: 36, goalsAgainst: 82, goalDiff: -46, points: 22, logo: "https://crests.football-data.org/346.png" },
+  { position: 20, team: "사우샘프턴", played: 38, won: 2, draw: 6, lost: 30, goalsFor: 26, goalsAgainst: 86, goalDiff: -60, points: 12, logo: "https://crests.football-data.org/340.png" }
+];
+
+const goalScorers = [
+  { player: "모하메드 살라", team: "리버풀", stat: 29 },
+  { player: "알렉산데르 이사크", team: "뉴캐슬", stat: 23 },
+  { player: "엘링 홀란", team: "맨체스터 시티", stat: 22 },
+  { player: "크리스 우드", team: "노팅엄", stat: 20 },
+  { player: "브라이언 음뵈모", team: "브렌트포드", stat: 20 },
+  { player: "요안 위사", team: "브렌트포드", stat: 19 },
+  { player: "올리 왓킨스", team: "애스턴 빌라", stat: 16 },
+  { player: "콜 팔머", team: "첼시", stat: 15 },
+  { player: "마테우스 쿠냐", team: "울버햄튼", stat: 15 },
+  { player: "장 필리페 마테타", team: "크리스털 팰리스", stat: 14 },
+  { player: "요르겐 라르센", team: "울버햄튼", stat: 14 }
+];
+
+const assistProviders = [
+  { player: "모하메드 살라", team: "리버풀", stat: 18 },
+  { player: "제이콥 머피", team: "뉴캐슬", stat: 12 },
+  { player: "안토니 엘란가", team: "노팅엄", stat: 11 },
+  { player: "모건 로저스", team: "애스턴 빌라", stat: 10 },
+  { player: "브루노 페르난데스", team: "맨유", stat: 10 },
+  { player: "부카요 사카", team: "아스널", stat: 10 },
+  { player: "안토니 로빈슨", team: "풀럼", stat: 10 },
+  { player: "미켈 담스고르", team: "브렌트포드", stat: 9 },
+  { player: "손흥민", team: "토트넘", stat: 9 },
+  { player: "재러드 보언", team: "웨스트햄", stat: 9 }
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.querySelector('#standingsTable tbody');
+  const btnGoals = document.getElementById('btnGoals');
+  const btnAssists = document.getElementById('btnAssists');
+  const statTitle = document.getElementById('statTitle');
+  const playerList = document.getElementById('playerList');
+
+  // 순위표 채우기
+  standings.forEach(team => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${team.position}</td>
+      <td class="team-name"><img class="team-logo" src="${team.logo}" alt="${team.team} 로고" /> ${team.team}</td>
+      <td>${team.played}</td>
+      <td>${team.won}</td>
+      <td>${team.draw}</td>
+      <td>${team.lost}</td>
+      <td>${team.goalsFor}</td>
+      <td>${team.goalsAgainst}</td>
+      <td>${team.goalDiff}</td>
+      <td>${team.points}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('standingsTable').style.display = 'table';
+
+  // 득점 선수 목록 그리기
+  function showGoalScorers() {
+    statTitle.textContent = "득점 선수 목록";
+    btnGoals.classList.add('active');
+    btnAssists.classList.remove('active');
+
+    let html = `<table><thead><tr><th>선수</th><th>팀</th><th>득점</th></tr></thead><tbody>`;
+    goalScorers.forEach(item => {
+      html += `<tr><td>${item.player}</td><td>${item.team}</td><td>${item.stat}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    playerList.innerHTML = html;
+
+    localStorage.setItem("selectedStat", "goal");
+  }
+
+  // 어시스트 선수 목록 그리기
+  function showAssistProviders() {
+    statTitle.textContent = "어시스트 선수 목록";
+    btnAssists.classList.add('active');
+    btnGoals.classList.remove('active');
+
+    let html = `<table><thead><tr><th>선수</th><th>팀</th><th>어시스트</th></tr></thead><tbody>`;
+    assistProviders.forEach(item => {
+      html += `<tr><td>${item.player}</td><td>${item.team}</td><td>${item.stat}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+    playerList.innerHTML = html;
+
+    localStorage.setItem("selectedStat", "assist");
+  }
+
+  // localStorage에 저장된 값으로 초기 상태 설정
+  const savedStat = localStorage.getItem("selectedStat");
+  if (savedStat === "assist") {
+    showAssistProviders();
+  } else {
+    showGoalScorers();
+  }
+
+  // 버튼 클릭 이벤트 등록
+  btnGoals.addEventListener('click', showGoalScorers);
+  btnAssists.addEventListener('click', showAssistProviders);
+});
+
+</script>
+
+
+
+</body>
+</html>
+	

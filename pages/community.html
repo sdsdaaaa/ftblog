@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>FOOTBALLOG 커뮤니티</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background-color: #f0f2f5;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 30px;
+    }
+
+    .wide-community-card {
+      background: linear-gradient(135deg, #1f2c4c, #3a506b);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .wide-community-card:hover {
+      transform: scale(1.02);
+    }
+
+    .wide-community-card h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .wide-community-card p {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .community-card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .community-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .community-card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .community-card p {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h1>⚽ FOOTBALLOG 커뮤니티</h1>
+
+    <!-- 🟦 메인 커뮤니티 카드 (2배 넓이) -->
+    <div class="wide-community-card" onclick="handleMenuClick('FBLOG')">
+      <div class="card-content">
+        <h2>FOOTBALLOG 커뮤니티</h2>
+        <p>우리들의 축구 이야기, 지금 시작해보세요!</p>
+      </div>
+    </div>
+
+    <!-- 🔳 일반 커뮤니티 카드 예시 -->
+    <div class="card-grid">
+      <div class="community-card">
+        <h3>자유 게시판</h3>
+        <p>축구 팬들과 자유롭게 소통하는 공간</p>
+      </div>
+      <div class="community-card">
+        <h3>전술 토론</h3>
+        <p>당신만의 전술을 소개하고 의견을 나누세요</p>
+      </div>
+      <div class="community-card">
+        <h3>축구 뉴스 댓글</h3>
+        <p>최신 축구 기사에 대한 당신의 생각은?</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function handleMenuClick(id) {
+      if (id === 'FBLOG') {
+        window.location.href = 'FBLOG.html';  // 경로는 필요시 조정
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Football Intro</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden;
+    }
+#introText {
+  font-size: 60px;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8),
+               0 0 20px rgba(255,255,255,0.6),
+               0 0 30px rgba(255,255,255,0.4);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+}
+.intro-fade {
+  animation: cinematicFade 3s ease-in-out forwards;
+}
+
+@keyframes cinematicFade {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.98); }
+  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+#introOverlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  opacity: 0;
+  z-index: 4; /* introText 아래, 이미지 위 */
+  transition: opacity 1.5s ease;
+  pointer-events: none;
+}
+#introOverlay.show {
+  opacity: 0.6; /* 흐림 정도는 조절 가능 */
+}
+
+
+#skipNotice {
+  position: absolute;
+  top: 30px;
+  left: 30px; /* or use: left: 50%; transform: translateX(-50%); for center */
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 14px;
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 5px;
+  z-index: 6;
+  opacity: 0;
+  animation: fadeIn 2s ease-in-out forwards;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5);
+  pointer-events: none;
+}
+#skipNotice.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+
+
+    /* 인트로 애니메이션 영역 */
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+   .scene {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  background-color: black;
+  z-index: 0; /* 🔥 반드시 낮게 유지 */
+pointer-events: none;
+}
+
+.scene.contain-fit {
+  object-fit: contain; /* 55번만 원래 비율 유지 */
+}
+    .active {
+      opacity: 1;
+    }
+    #fadeOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2s ease;
+      z-index: 1;
+    }
+
+#finalTitle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 100px;
+  color: blue;
+  font-family: 'Bebas Neue', 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-weight: 1500;
+  opacity: 0;
+  z-index: 5;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8),
+               0 0 20px rgba(255,255,255,0.6),
+               0 0 30px rgba(255,255,255,0.4);
+  pointer-events: none;
+  transition: opacity 2s ease;
+}
+#finalTitle.show {
+  opacity: 1;
+}
+
+#introFadeOutOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10000;
+  transition: opacity 2s ease;
+}
+#introFadeOutOverlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+    #startBtn {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 20;
+    }
+    #startBtn.show {
+      opacity: 1;
+    }
+
+    /* 본 콘텐츠 영역 */
+    #mainWrapper {
+      height: 100vh;
+      overflow: hidden;
+      display: none;
+    }
+    #scrollArea {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+ 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#scrollArea::-webkit-scrollbar {
+  display: none;
+}
+    .section {
+      width: 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      background: white;
+    }
+
+    /* 하단 진행도 */
+    .progress-dots {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 99;
+    }
+    .progress-dots span {
+      width: 10px;
+      height: 10px;
+      background: #aaa;
+      border-radius: 50%;
+      display: inline-block;
+      transition: background 0.3s;
+    }
+    .progress-dots span.active {
+      background: #f44336;
+    }
+
+    /* 마지막 버튼 섹션 */
+    .final-buttons {
+      display: flex;
+      gap: 20px;
+    }
+    .final-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+#skipOverlay {
+  top: 200; left: 200;
+  width: 300vw;
+  height: 300vh;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 1s ease;
+}
+#skipOverlay.active {
+  opacity: 1;
+}
+#homeBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 3;
+  transition: background-color 0.3s ease;
+}
+#homeBtn:hover {
+  background-color: rgba(255, 0, 0, 0.8);
+}
+
+
+#pageTransitionOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  opacity: 0;
+  z-index: 4;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+#pageTransitionOverlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+  </style>
+</head>
+<body>
+  <!-- 인트로 애니메이션 -->
+  <div id="container">
+<div id="introOverlay"></div> <!-- 인트로용 페이드 오버레이 -->
+<div id="fadeOverlay"></div>
+ <div id="introText">THE MOST COMPLETE<br>SOCCER PAGE</div>
+ <div id="skipNotice">ESC 키를 눌러 인트로 스킵하기</div>
+<button id="homeBtn">홈으로</button>
+<div id="finalTitle">THE FOOTBALLOG</div>
+    <button id="startBtn">시작하기</button>
+<div id="introFadeOutOverlay"></div>
+  </div>
+
+  <!-- 본 콘텐츠 -->
+  <div id="mainWrapper">
+    <div id="scrollArea">
+      <div class="section">1단계 내용</div>
+      <div class="section">2단계 내용</div>
+      <div class="section">3단계 내용</div>
+      <div class="section">
+        <div class="final-buttons">
+          <button onclick="transitionToIndex()">회원가입 없이 이용하기</button>
+          <button onclick="goToSignup()">회원가입하기</button>
+          <button onclick="goToLogin()">로그인하기</button>
+        </div>
+      </div>
+    </div>
+    <div class="progress-dots" id="progressDots"></div>
+  </div>
+
+<script>
+  let isIntroPlaying = true;
+let hasEnteredScrollPage = false;
+let currentSectionIndex = 0;
+let scenes = []; // ✅ 누락된 전역 선언
+
+
+  // 이미지 자동 생성
+for (let i = 1; i <= 61; i++) {
+  if ((i >= 34 && i <= 37)||(i >= 41 && i <= 44)) continue;
+  const num = String(i).padStart(4, '0');
+  const img = document.createElement('img');
+  img.className = 'scene';
+  img.src = `INTROPIC/${num}.png`;
+  img.alt = num;
+  document.getElementById('container').appendChild(img);
+}
+
+  const startBtn = document.getElementById('startBtn');
+  const fadeOverlay = document.getElementById('fadeOverlay');
+  const scrollArea = document.getElementById('scrollArea');
+  const sections = document.querySelectorAll('.section');
+  const dots = [];
+
+window.onload = () => {
+  const container = document.getElementById('container');
+  const introOverlay = document.getElementById('introOverlay');
+  const introText = document.getElementById('introText');
+
+  // 🔹 인트로 텍스트 전면 배치
+  container.insertBefore(introText, container.firstChild);
+
+  // 🔹 검정 오버레이 서서히 등장
+  introOverlay.classList.add('show');
+
+  // 🔹 인트로 텍스트 페이드 인
+  introText.classList.add('intro-fade');
+
+setTimeout(() => {
+  const skipNotice = document.getElementById('skipNotice');
+  if (skipNotice) {
+    // 🔥 animation 제거 후 클래스 추가
+    skipNotice.style.animation = 'none'; 
+    skipNotice.classList.add('hide');
+  }
+}, 5000);
+
+
+  setTimeout(() => {
+    // 🔹 텍스트/오버레이 제거 → 이미지 시작
+    introText.remove();
+    introOverlay.remove();
+
+    scenes = document.querySelectorAll('.scene');
+    showScene(0);
+    setupDots();
+    document.getElementById('homeBtn').onclick = transitionToIndex;
+  }, 2000);
+const finalTitle = document.getElementById('finalTitle');
+
+setTimeout(() => {
+  finalTitle.classList.add('show');
+}, 10000); // 🔥 5초 후 등장
+
+};
+
+
+
+function showScene(i) {
+  if (i < scenes.length) {
+    // 현재 장면 활성화
+    scenes[i].classList.add('active');
+
+    // 이전 장면 제거
+    if (i > 0) {
+      setTimeout(() => {
+        scenes[i - 1].classList.remove('active');
+      }, 300);
+    }
+
+    // 다음 장면으로 전환
+    setTimeout(() => {
+      showScene(i + 1);
+    }, 200);
+  } else {
+    // 모든 scene 재생 완료 후 → 55번 이미지 추가
+    fadeOverlay.style.opacity = '1';
+
+    setTimeout(() => {
+      const lastImg = document.createElement('img');
+      lastImg.className = 'scene contain-fit active';
+      lastImg.src = 'INTROPIC/0062.png';
+      lastImg.alt = '0062';
+      document.getElementById('container').appendChild(lastImg);
+
+      fadeOverlay.style.opacity = '0';
+
+      setTimeout(() => {
+        startBtn.classList.add('show');
+        isIntroPlaying = false;
+      }, 2000);
+    }, 2000);
+  }
+}
+
+
+  // 시작하기 버튼 클릭 → 첫 페이지 중간쯤
+  startBtn.onclick = () => {
+  const fadeOutOverlay = document.getElementById('introFadeOutOverlay');
+  fadeOutOverlay.classList.add('show');
+
+  setTimeout(() => {
+    enterScrollPage(true); // 기존 함수 실행
+  }, 1000); // 1초 페이드 아웃 후 이동
+};
+
+
+ function enterScrollPage(isSmoothMid) {
+  document.getElementById('container').style.display = 'none';
+  document.getElementById('mainWrapper').style.display = 'block';
+  const notice = document.getElementById('skipNotice');
+  if (notice) notice.style.display = 'none';
+
+  const homeBtn = document.getElementById('homeBtn');
+  if (homeBtn) homeBtn.style.display = 'none'; // ✅ 홈 버튼 숨기기
+
+  scrollArea.scrollTo({
+    top: isSmoothMid ? window.innerHeight * 0.3 : 0,
+    behavior: 'smooth'
+  });
+
+  hasEnteredScrollPage = true;
+  currentSectionIndex = 0;
+  updateDots(0);
+}
+
+
+  function triggerSkipAnimationToFirstPageExact() {
+    const skipOverlay = document.getElementById('skipOverlay');
+    skipOverlay.classList.add('active');
+
+    setTimeout(() => {
+      enterScrollPage(false); // top: 0
+      skipOverlay.classList.remove('active');
+    }, 1000);
+  }
+
+  // ESC / SPACE 전역 핸들링
+ document.addEventListener('keydown', function (e) {
+  const isEsc = e.key === 'Escape' || e.keyCode === 27;
+  const isSpace = e.code === 'Space' || e.key === ' ' || e.keyCode === 32;
+
+  if (isEsc || isSpace) {
+    e.preventDefault(); // 스페이스 스크롤 막기
+
+    if (isIntroPlaying && !hasEnteredScrollPage) {
+      // 🔹 ESC or Space during intro → skip intro to first scroll page
+      triggerSkipAnimationToFirstPageExact();
+    } else if (hasEnteredScrollPage) {
+     if (isEsc) {
+  transitionToIndex();  // 마지막 페이지가 아니라 홈으로 이동 + 애니메이션
+}
+ else if (isSpace) {
+        // 🔹 Space in scroll → move one section down
+        scrollToNextSection();
+      }
+    }
+  }
+});
+
+
+  function scrollToNextSection() {
+    if (currentSectionIndex < sections.length - 1) {
+      currentSectionIndex++;
+      scrollArea.scrollTo({
+        top: window.innerHeight * currentSectionIndex,
+        behavior: 'smooth'
+      });
+      updateDots(currentSectionIndex);
+    }
+  }
+
+  // 진행도 점 생성 및 갱신
+  function setupDots() {
+    const dotContainer = document.getElementById('progressDots');
+    sections.forEach((_, i) => {
+      const dot = document.createElement('span');
+      if (i === 0) dot.classList.add('active');
+      dotContainer.appendChild(dot);
+      dots.push(dot);
+    });
+  }
+
+  function updateDots(index) {
+    dots.forEach(dot => dot.classList.remove('active'));
+    if (dots[index]) dots[index].classList.add('active');
+  }
+
+  scrollArea.addEventListener('scroll', () => {
+    const index = Math.round(scrollArea.scrollTop / window.innerHeight);
+    currentSectionIndex = index;
+    updateDots(index);
+  });
+function transitionToIndex() {
+  const overlay = document.getElementById('pageTransitionOverlay');
+  overlay.classList.add('active');
+
+  setTimeout(() => {
+    window.location.href = 'home.html';
+  }, 1000); // 애니메이션 후 이동
+}
+
+function goToSignup() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    overlay.classList.add('active');
+
+    setTimeout(() => {
+      window.location.href = 'signup.html'; // ✅ 회원가입 페이지로 이동
+    }, 1000);
+  }
+
+  function goToLogin() {
+    const overlay = document.getElementById('pageTransitionOverlay');
+    overlay.classList.add('active');
+
+    setTimeout(() => {
+      window.location.href = 'login.html'; // ✅ 로그인 페이지로 이동
+    }, 1000);
+  }
+
+</script>
+
+<div id="pageTransitionOverlay"></div>
+</body>
+ <div id="skipOverlay"></div>
+</html>

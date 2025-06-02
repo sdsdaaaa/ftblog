@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>마이페이지 - FOOTBALLOG</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background: #f5f6fa;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+    }
+
+    main.mypage-container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 40px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .info-group {
+      margin-bottom: 20px;
+    }
+
+    .info-group label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .info-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .home-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .change-btn {
+      background-color: #2ecc71;
+      color: white;
+    }
+
+    .logout-btn {
+      background-color: #d63031;
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .pw-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pw-section input {
+      flex: 1;
+    }
+
+    .pw-section button {
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pw-confirm {
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="mypage-container">
+    <h2>🙋 내 정보</h2>
+
+    <div class="info-group">
+      <label>이름</label>
+      <input type="text" id="name" />
+    </div>
+
+    <div class="info-group">
+  <label>닉네임</label>
+  <div class="pw-section">
+    <input type="text" id="nickname" />
+    <button onclick="checkNickname()">중복확인</button>
+  </div>
+  <small id="nickname-status" style="margin-top: 4px; display: block; font-size: 12px;"></small>
+</div>
+
+    <div class="info-group">
+      <label>이메일 (수정 불가)</label>
+      <input type="text" id="email" disabled />
+    </div>
+
+    <div class="info-group">
+      <label>나이</label>
+      <input type="text" id="age" />
+    </div>
+
+    <div class="info-group">
+      <label>전화번호</label>
+      <input type="text" id="phone" />
+    </div>
+
+    <div class="info-group">
+      <label>현재 비밀번호 확인</label>
+      <div class="pw-section">
+        <input type="password" id="current-password" placeholder="현재 비밀번호" />
+        <button onclick="verifyCurrentPassword()">확인</button>
+      </div>
+    </div>
+
+    <div class="info-group pw-confirm" id="pw-confirm-group">
+      <label>새 비밀번호</label>
+      <div class="pw-section">
+        <input type="password" id="new-password" placeholder="새 비밀번호" />
+        <button onclick="changePassword()">변경</button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn home-btn" onclick="goHome()">HOME</button>
+      <button class="btn change-btn" onclick="saveChanges()">CHANGE</button>
+      <button class="btn logout-btn" onclick="logout()">LOGOUT</button>
+    </div>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+    import {
+  getFirestore, doc, getDoc, updateDoc,
+  getDocs, query, collection, where
+} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA02saQDvqMQbDLrD5UMwX848E6eFO-rUU",
+      authDomain: "northern-cooler-461505-d5.firebaseapp.com",
+      projectId: "northern-cooler-461505-d5",
+      storageBucket: "northern-cooler-461505-d5.appspot.com",
+      messagingSenderId: "57199546606",
+      appId: "1:57199546606:web:b4e134094c86623e25a3ff",
+      measurementId: "G-562VJ9VE2P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentUser;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById("name").value = data.name || "";
+          document.getElementById("nickname").value = data.nickname || "";
+          document.getElementById("email").value = data.email || "";
+          document.getElementById("age").value = data.age || "";
+          document.getElementById("phone").value = data.phone || "";
+        }
+      } else {
+        alert("로그인이 필요합니다.");
+        window.location.href = "login.html";
+      }
+    });
+
+    window.logout = function () {
+      signOut(auth).then(() => {
+        alert("로그아웃 되었습니다.");
+        window.location.href = "login.html";
+      });
+    };
+
+    window.goHome = function () {
+      window.location.href = "home.html";
+    };
+
+    window.saveChanges = async function () {
+  const name = document.getElementById("name").value.trim();
+  const nickname = document.getElementById("nickname").value.trim();
+  const age = document.getElementById("age").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!name || !nickname || !age || !phone) {
+    alert("모든 항목을 입력하세요.");
+    return;
+  }
+ if (nickname !== lastCheckedNickname && nicknameValid === false) {
+    alert("닉네임 중복 확인을 해주세요.");
+    return;
+  }
+
+  // ✅ 닉네임 중복 검사 추가
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("nickname", "==", nickname)
+    );
+    const querySnapshot = await getDocs(q);
+
+    let nicknameTaken = false;
+    querySnapshot.forEach((docSnap) => {
+      if (docSnap.id !== currentUser.uid) {
+        nicknameTaken = true;
+      }
+    });
+
+    if (nicknameTaken) {
+      alert("❌ 이미 사용 중인 닉네임입니다.");
+      return;
+    }
+
+    const userRef = doc(db, "users", currentUser.uid);
+    await updateDoc(userRef, { name, nickname, age, phone });
+    alert("✅ 정보가 저장되었습니다.");
+
+  } catch (err) {
+    alert("오류: " + err.message);
+  }
+};
+
+
+    window.verifyCurrentPassword = async function () {
+      const currentPassword = document.getElementById("current-password").value;
+      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+      try {
+        await reauthenticateWithCredential(currentUser, credential);
+        document.getElementById("pw-confirm-group").style.display = "block";
+        alert("✅ 확인되었습니다. 새 비밀번호를 입력하세요.");
+      } catch (error) {
+        alert("현재 비밀번호가 일치하지 않습니다.");
+      }
+    };
+
+    window.changePassword = async function () {
+      const newPassword = document.getElementById("new-password").value;
+      try {
+        await updatePassword(currentUser, newPassword);
+        alert("🎉 비밀번호가 변경되었습니다.");
+        document.getElementById("new-password").value = "";
+        document.getElementById("current-password").value = "";
+        document.getElementById("pw-confirm-group").style.display = "none";
+      } catch (err) {
+        alert("비밀번호 변경 실패: " + err.message);
+      }
+    };
+let lastCheckedNickname = "";
+let nicknameValid = true; // 기본 true로 설정 (닉네임 안 바꾼 경우엔 통과)
+
+window.checkNickname = async function () {
+  const nickname = document.getElementById("nickname").value.trim();
+  const statusEl = document.getElementById("nickname-status");
+
+  if (!nickname) {
+    statusEl.textContent = "❌ 닉네임을 입력해주세요.";
+    statusEl.style.color = "red";
+    nicknameValid = false;
+    return;
+  }
+
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("nickname", "==", nickname)
+    );
+    const querySnapshot = await getDocs(q);
+
+    let isTaken = false;
+    querySnapshot.forEach((docSnap) => {
+      if (docSnap.id !== currentUser.uid) isTaken = true;
+    });
+
+    if (isTaken) {
+      statusEl.textContent = "❌ 이미 사용 중인 닉네임입니다.";
+      statusEl.style.color = "red";
+      nicknameValid = false;
+    } else {
+      statusEl.textContent = "✅ 사용 가능한 닉네임입니다.";
+      statusEl.style.color = "green";
+      nicknameValid = true;
+      lastCheckedNickname = nickname;
+    }
+  } catch (err) {
+    statusEl.textContent = "오류 발생: " + err.message;
+    statusEl.style.color = "red";
+    nicknameValid = false;
+  }
+};
+
+
+  </script>
+</body>
+</html>
